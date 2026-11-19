@@ -1,5 +1,10 @@
 # OSP (One SSO Provider): Documentation
 
+> [!IMPORTANT]
+> **Disclaimer:** This documentation is the product of independent research by [Point Blue Technology](https://www.pointbluetech.com). It is **not** official documentation or support information from OpenText, and OpenText has not reviewed or endorsed it. It is provided as is, without warranty. Test anything here in a non-production environment first, and use OpenText's official documentation and support channels for supported guidance.
+>
+> OpenText, NetIQ, Identity Manager and Access Manager are trademarks of their respective owners.
+
 **OSP** (OpenText/NetIQ *One SSO Provider*, internally "OSP / OIDP") is the authorization server bundled with **Identity Manager 4.10.2**.
 
 | | |
