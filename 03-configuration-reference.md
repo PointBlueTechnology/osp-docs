@@ -54,7 +54,7 @@ Simpler alternatives:
 1. `ospcfg.xml` in the ext-context jar names `com.netiq.osp.uaconfig.PropertiesSupplier` (in `uaconfig-osp-7.1.0-4.jar`) as the property loader.
 2. Keys starting with `com.netiq.idm.osp.` or `internal.osp.` pass through unchanged. `ENCRYPT` values are decrypted on demand.
 3. *Generator* classes then **compute** additional keys and XML fragments from the user-facing keys: clients, keys, SAML2, Kerberos, SSPR, CEF, whitelists, attribute maps, HTTP interfaces.
-4. The result fills the `${key:default}` placeholders in `ospcfg.xml`, `idm/tenantcfg.xml` and `idm/services/authcfg.xml`. The complete list of placeholders is in [Appendix B](B-runtime-property-placeholders.md). Resolution order: properties file, then Java `-D` property, then environment variable, then the default.
+4. The result fills the `${key:default}` placeholders in `ospcfg.xml`, `idm/tenantcfg.xml` and `idm/services/authcfg.xml`. The complete list of placeholders is in [Appendix B](appendix-b-runtime-placeholders.md). Resolution order: properties file, then Java `-D` property, then environment variable, then the default.
 
 **Legacy User Application keys take precedence** whenever `DirectoryService/realms/jndi/params/AUTHORITY` is present, which is the normal IDM case. For the following settings, the UA keys win over the `com.netiq.idm.osp.*` equivalents:
 - users container
@@ -68,7 +68,7 @@ If an OSP setting "doesn't take", check for a UA-style key in the same file.
 
 **Debugging the effective configuration:** with `-Dcom.netiq.idm.osp.logging.level=DEBUG`, the translator logs every effective property, with secrets masked.
 
-Defaults below come from `/idm/osp/conf/osp_init.properties` (the first-run template), ConfigUpdate's definitions ([Appendix A](A-configupdate-option-catalog.md)) and the OSP configuration XML ([Appendix B](B-runtime-property-placeholders.md)).
+Defaults below come from `/idm/osp/conf/osp_init.properties` (the first-run template), ConfigUpdate's definitions ([Appendix A](appendix-a-configupdate-options.md)) and the OSP configuration XML ([Appendix B](appendix-b-runtime-placeholders.md)).
 
 ### 3.2.1 Server identity and URLs
 
@@ -222,7 +222,7 @@ Legacy bulk keys `com.netiq.idm.osp.client-ids` and `com.netiq.idm.osp.oauth.sha
 
 ### 3.2.9 Runtime-only keys (not offered by ConfigUpdate)
 
-These are honoured by the OSP 7.1.0 runtime but have no ConfigUpdate field. Set them directly in `ism-configuration.properties`. The rest of the 268 placeholders are in [Appendix B](B-runtime-property-placeholders.md).
+These are honoured by the OSP 7.1.0 runtime but have no ConfigUpdate field. Set them directly in `ism-configuration.properties`. The rest of the 268 placeholders are in [Appendix B](appendix-b-runtime-placeholders.md).
 
 | Key | Default | Meaning |
 |---|---|---|

@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Version analysed | OSP **7.1.0** (2025-06-12), container image `osp:idm-4.10.2-591` (and `0200-81` on idm254), Tomcat 10.1 |
-| Source | `Identity_Manager_4.10.2_Containers.tar.gz`, plus read-only checks of the idm254 deployment on `nam-k3s` (192.168.103.98) |
+| Source | `Identity_Manager_4.10.2_Containers.tar.gz`, plus read-only checks of the idm254 deployment on `nam-k3s` |
 | Date | 2026-11-19 |
 
 The vendor documents almost none of this. Statements marked **[C]** were confirmed in the shipped product or configuration; **[I]** marks inferences.
@@ -29,8 +29,8 @@ The vendor documents almost none of this. Statements marked **[C]** were confirm
 | [03 Configuration reference](03-configuration-reference.md) | How configuration is loaded; every runtime property by area; value encryption; JVM flags; tools; branding |
 | [04 Endpoints, OAuth/OIDC and clients](04-endpoints-and-protocols.md) | URL map, what discovery and tokens contain, **how to add an OAuth client**, the admin API |
 | [05 SAML and federation](05-saml-and-federation.md) | **Making OSP a SAML SP** (manual and NAM auto-setup), SAML properties, whether OSP can be an OIDC client (no: alternatives), replacing OSP with NAM |
-| [Appendix A: ConfigUpdate option catalog](A-configupdate-option-catalog.md) | All ~230 settings ConfigUpdate exposes, with labels and help text (generated) |
-| [Appendix B: Runtime placeholders](B-runtime-property-placeholders.md) | All 268 `${key:default}` placeholders in OSP's built-in configuration (generated) |
+| [Appendix A: ConfigUpdate option catalog](appendix-a-configupdate-options.md) | All ~230 settings ConfigUpdate exposes, with labels and help text (generated) |
+| [Appendix B: Runtime placeholders](appendix-b-runtime-placeholders.md) | All 268 `${key:default}` placeholders in OSP's built-in configuration (generated) |
 
 **Operating it**
 
