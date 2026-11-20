@@ -24,7 +24,9 @@ Errors come back as an XDAS fault in JSON, for example `{"Fault":{"Code":{"Value
 
 | Endpoint | Methods | Auth | Purpose |
 |---|---|---|---|
-| `.well-known/openid-configuration` | GET | none | OIDC discovery |
+| `.well-known/openid-configuration` | GET | none | OIDC discovery (OpenID Connect Discovery 1.0) |
+| `.well-known/oauth-authorization-server` | GET | none | OAuth 2.0 Authorization Server Metadata (RFC 8414). In 7.1.0 it returns the same document as `openid-configuration`. |
+| `metadata` | GET | | Not present in OSP 7.1.0 (returns 404 `XDAS_OUT_ENTITY_NON_EXISTANT`). Some public examples use it to list OAuth clients on other OSP versions. Do not confuse with SAML `saml2/metadata`. |
 | `jwks` | GET | none | Public signing key(s) as JWK with `x5c` certificate chain |
 | `auth`, `grant` | GET/POST | user (browser) | Authorization endpoint. Discovery advertises `auth`; the IDM apps use `grant`. They are the same handler. |
 | `token` | POST | client | Token endpoint (all grants) |
@@ -38,7 +40,7 @@ Errors come back as an XDAS fault in JSON, for example `{"Fault":{"Code":{"Value
 | `sign` | POST | client | Signs/encrypts data with the OSP key |
 | `resetcachedclient` | DELETE | client | Drop a cached client definition |
 | `getmy…`/`setmy…`/`deletemy…` `revocationtargets`, `useranswers` | GET/PUT/DELETE | user | Self-service data |
-| `gettheir…`/`settheir…`/`deletetheir…` | GET/PUT/DELETE | admin | Same, for other users |
+| `gettheir…`/`settheir…`/`deletetheir…` | GET/PUT/DELETE | admin | Same, for other users. Examples: `gettheirrevocationtargets?user_id=<dn>&auth_source_id=<src>` (GET); `deletetheirrevocationtargets?user_id=<dn>&auth_source_id=<src>&entry_id=<id>` (DELETE). |
 | `client-registration` / `register` | | | **Not configured** (403/404). Clients come only from properties. |
 
 ### What discovery advertises
@@ -126,7 +128,7 @@ These endpoints require a principal holding `IDPAdministrator`, sent as HTTP Bas
 | `/s/restart` | Restart OSP. ConfigUpdate's NAM auto-setup uses it. |
 | `/s/tlsClientCertificate` | TLS client certificate |
 | `/s/cluster/{nodes,messages,reset,sync}` | Cluster operations |
-| `/s/idm` (GET/PUT/DELETE), `/s/idm/{get,health,loglevel,restart,start,stop}` | Tenant |
+| `/s/idm` (GET/PUT/DELETE), `/s/idm/{get,health,loglevel,restart,start,stop}` | Tenant (`/s/{tenant}/get` is the same pattern) |
 | `/s/idm/rollkeys`, `/s/idm/deleterolledkeys`, signing/encryption certificates | **Key rollover** |
 | `/s/idm/auth/{get,health,restart,start,stop}` | Service |
 
@@ -225,6 +227,7 @@ Each IDM app has the same client ID and secret in **its own** `ism-configuration
 H=https://idm254.pointbluetech.com/osp
 curl -s $H/a/idm/auth/app/ping                                   # pong
 curl -s $H/a/idm/auth/oauth2/.well-known/openid-configuration | jq .issuer
+curl -s $H/a/idm/auth/oauth2/.well-known/oauth-authorization-server | jq .issuer
 curl -s $H/a/idm/auth/oauth2/jwks | jq '.keys[].kid'
 # Password grant (only for a client that allows "password"):
 curl -s -u <client>:<secret> -d grant_type=password -d username=<cn> -d password=<pw> -d scope=openid \
