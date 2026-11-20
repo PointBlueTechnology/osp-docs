@@ -207,9 +207,9 @@ https://$SSPR_SERVER_HOST:$SSPR_SERVER_SSL_PORT
 This is why the issuer, redirect URIs, and `com.netiq.idm.osp.url.host` point at the public host. The rewrite then:
 
 1. Imports `/config/certificates/tls.{crt,key}` into `tomcat.ks` and `idm.jks` as alias `ospservercert`.
-2. Imports `/config/certificates/ingress-tls.crt` into `idm.jks` as `ingresscert`. OSP and its clients then trust the public certificate when they call each other through the ingress.
+2. Imports `/config/certificates/ingress-tls.crt` into `idm.jks` as `ingresscert`. Callers that load `idm.jks` then trust the public certificate on calls through the ingress.
 
-> **Gotcha:** When the ingress certificate is renewed (for example by cert-manager or Let's Encrypt every 90 days), the copy in `idm.jks` is refreshed only when the pod restarts. Server-to-server calls from UA and Reporting to `https://<ingress>/osp/...` then fail TLS validation until the pods are restarted. Let's Encrypt chains to a public root, which the JRE `cacerts` usually trusts. Whether the fallback to `cacerts` is used depends on how each component loads `idm.jks`.
+> **Gotcha:** When the ingress certificate is renewed (for example by cert-manager or Let's Encrypt every 90 days), the copy in `idm.jks` is refreshed only when the pod restarts. Calls to OSP use two truststores ([03](03-configuration-reference.md#client-side-properties-that-share-the-comnetiqidmosp-prefix)). The UA and Reporting back-channel trusts OSP with `com.netiq.idm.osp.ssl-keystore.file` (default `tomcat.ks`). OSP's outbound TLS uses `com.netiq.idm.osp.oauth-truststore.file` (`idm.jks`). Server-to-server calls that depend on the `ingresscert` entry then fail TLS validation until those pods are restarted. Let's Encrypt chains to a public root, which the JRE `cacerts` usually trusts. Whether that fallback is used depends on which truststore the caller loaded.
 
 ## 2.6 Docker / Ansible deployment (non-Kubernetes)
 
