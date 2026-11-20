@@ -56,12 +56,14 @@ Simpler alternatives:
 3. *Generator* classes then **compute** additional keys and XML fragments from the user-facing keys: clients, keys, SAML2, Kerberos, SSPR, CEF, whitelists, attribute maps, HTTP interfaces.
 4. The result fills the `${key:default}` placeholders in `ospcfg.xml`, `idm/tenantcfg.xml` and `idm/services/authcfg.xml`. The complete list of placeholders is in [Appendix B](appendix-b-runtime-placeholders.md). Resolution order: properties file, then Java `-D` property, then environment variable, then the default.
 
+The loader accepts every `com.netiq.idm.osp.*` key. The prefix does not by itself mean OSP reads the key: some are read by the client applications from their own `ism-configuration.properties`. See [Client-side properties that share the com.netiq.idm.osp prefix](#client-side-properties-that-share-the-comnetiqidmosp-prefix).
+
 **Legacy User Application keys take precedence** whenever `DirectoryService/realms/jndi/params/AUTHORITY` is present, which is the normal IDM case. For the following settings, the UA keys win over the `com.netiq.idm.osp.*` equivalents:
 - users container
 - login attribute
 - LDAP host, port and SSL
 - search scope
-- truststore
+- LDAP truststore
 - admin name and password (`com.novell.idm.ldap.admin.user` / `.pass`)
 
 If an OSP setting "doesn't take", check for a UA-style key in the same file.
@@ -174,8 +176,29 @@ ConfigUpdate supports three layouts (`com.netiq.idm.osp.edit.oauth.keystore.card
 | Key | Default | Meaning |
 |---|---|---|
 | `com.netiq.idm.osp.oauth-truststore.file` / `.type` / `.pwd` | `/opt/netiq/idm/apps/tomcat/conf/idm.jks`, `PKCS12` | Trust store OSP uses for outbound TLS (LDAP, metadata, NAM) |
-| `com.netiq.idm.osp.ssl-keystore.file` / `.type` / `.pwd` | Tomcat keystore | Used by **clients** to trust OSP's TLS certificate |
+| `com.netiq.idm.osp.ssl-keystore.file` / `.type` / `.pwd` | `tomcat.ks` | **Not read by OSP.** Truststore the UA and Reporting `OAuthServlet` uses for the authorization-code back-channel to OSP's token endpoint. The default `tomcat.ks` must also contain the root CA. Point it at `idm.jks` and copy the password from `oauth-truststore.pwd`. See below. |
+| `com.netiq.rpt.ssl-keystore.file` / `.pwd` | | Reporting's client truststore for the same call, when Reporting is installed. Same recommendation: `idm.jks`, password copied from `oauth-truststore.pwd`. |
 | `com.netiq.idm.ua.ldap.keystore-pwd` | | Password of `idm.jks` (shared with UA) |
+
+`com.netiq.idm.auth.oauth.OAuthRestFilter` uses `DirectoryService/realms/jndi/params/KEYSTORE_PATH` as its truststore.
+
+#### Client-side properties that share the com.netiq.idm.osp prefix
+
+For the authorization code grant, the client-side `OAuthServlet` in UA and Reporting (not OSP) calls OSP's token endpoint over HTTPS. It builds the server certificate path from `com.netiq.idm.osp.ssl-keystore.file`.
+
+A default install points that file at `tomcat.ks`, Tomcat's keystore, so the store needs the root CA as well as the server certificate. Point it at `idm.jks`, which already includes the public and enterprise root CA certificates. Copy the password from `com.netiq.idm.osp.oauth-truststore.pwd`.
+
+Set this in the **client** application's `/opt/netiq/idm/apps/tomcat/conf/ism-configuration.properties` (UA: `/config/userapp/tomcat/conf/…` on the Kubernetes volume; Reporting has its own copy under `/config/reporting/…`). `OAuthServlet` reads that copy.
+
+```properties
+com.netiq.idm.osp.ssl-keystore.file = /opt/netiq/idm/apps/tomcat/conf/idm.jks
+# copy value from com.netiq.idm.osp.oauth-truststore.pwd
+com.netiq.idm.osp.ssl-keystore.pwd = <secret>
+# if reporting is installed also
+com.netiq.rpt.ssl-keystore.file = /opt/netiq/idm/apps/tomcat/conf/idm.jks
+# copy value from com.netiq.idm.osp.oauth-truststore.pwd
+com.netiq.rpt.ssl-keystore.pwd = <secret>
+```
 
 ### 3.2.6 OAuth clients
 

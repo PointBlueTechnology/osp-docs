@@ -68,7 +68,7 @@ Rotation options:
 | Certificate | Location | Renewal |
 |---|---|---|
 | Tomcat TLS | `tomcat.ks`, alias `ospservercert` in Kubernetes | From secret `<release>-osp-server-certificate`, imported at pod start |
-| Ingress certificate in the truststore | `idm.jks`, alias `ingresscert` | Refreshed only at pod start. After cert-manager renews the ingress certificate, restart OSP, UA and Reporting so server-to-server calls keep trusting it. |
+| Ingress certificate in the truststore | `idm.jks`, alias `ingresscert` | Refreshed only at pod start. After cert-manager renews the ingress certificate, restart callers that load `idm.jks` (OSP via `oauth-truststore.file`; UA and Reporting only when `ssl-keystore.file` points there). |
 | eDirectory CA | `idm.jks` | Needed for LDAPS |
 
 ## Backup
@@ -90,4 +90,5 @@ Without `encrypt-keys.pkcs12` and its password, the `ENCRYPT`ed values cannot be
 | `{"error":"invalid_request"}` on `grant` / `userinfo` | Missing parameters or bearer token |
 | `failure [temporary session]` from `app/activity` | No OSP session cookie; normal for an anonymous request |
 | Login works but the IDM app loops back to login | `com.netiq.idm.osp.url.host` or the client `redirect.url` points at an internal name (`osp:8543`, `identityapplications:8543`), or the client secrets differ between OSP and the app |
+| Authorization code login fails; UA or Reporting logs `PKIX path building failed` on the token exchange | The client truststore `com.netiq.idm.osp.ssl-keystore.file` (default `tomcat.ks`) lacks the CA that signed OSP's certificate. Point it at `idm.jks`, or import the root CA into `tomcat.ks`, then restart the app. Reporting uses `com.netiq.rpt.ssl-keystore.file` the same way. See [03](03-configuration-reference.md#client-side-properties-that-share-the-comnetiqidmosp-prefix). |
 | Container exits with "Configured data layer has been run with version later than…" | The image is older than the volume's `version.properties`. Use the matching or a newer image. |

@@ -42,6 +42,8 @@ All of them are in `ldapconfig_support-6.0.0-4.jar`. The UI labels and help text
 | `com.netiq.idm.osp.edit.reverse-proxy-interface.tls` *(UI-only, not persisted)* | checkbox |  | com.netiq.idm.osp.edit.reverse-proxy.separate-interface = true; app: osp | Proxied requests use TLS — Select this if the reverse proxy forwards requests using TLS. |
 | `com.netiq.idm.osp.edit.reverse-proxy.auto-urls` *(UI-only, not persisted)* | checkbox | `true` | com.netiq.idm.osp.edit.reverse-proxy.separate-interface = true; app: (ua + !ua:sso) \| (ig + !ig:sso) \| (rpt + !rpt:sso) | Obtain front-facing OAuth URLs dynamically — Select this if the web applications will obtain the URLs for browser access to the OAuth provider automatically via metadata obtained from the provider through the reverse proxy. |
 
+> `com.netiq.idm.osp.ssl-keystore.*` is a client setting. UA and Reporting's `OAuthServlet` reads `.file` (a default install points it at `tomcat.ks`); OSP does not. The Meaning column is ConfigUpdate's help text. See [03](03-configuration-reference.md#client-side-properties-that-share-the-comnetiqidmosp-prefix).
+
 #### auth-defs — Authentication › Authentication Configuration
 
 | Key | Type | Default | Shown when | Meaning |
